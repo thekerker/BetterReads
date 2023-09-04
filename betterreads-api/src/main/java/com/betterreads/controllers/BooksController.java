@@ -1,11 +1,8 @@
 package com.betterreads.controllers;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -16,90 +13,131 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betterreads.models.Author;
 import com.betterreads.models.Book;
-import com.betterreads.models.Publisher;
-import com.betterreads.models.Author.Name;
+import com.betterreads.models.Search;
+import com.betterreads.services.IService;
+
+import jakarta.validation.Valid;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * API for handling books
+ */
 @RestController
-public class BooksController {
+@RequestMapping("/v1")
+public class BooksController extends BaseController {
 
+    @Autowired
+    private IService booksService;
+
+    /**
+     * <p>
+     * Gets books from the data store
+     * </p>
+     * 
+     * @return all books
+     */
     @GetMapping(path = "/books")
-    public CollectionModel<EntityModel<Book>> getAll() {
-        EntityModel<Book> entity = EntityModel.of(getMockBook());
+    public CollectionModel<EntityModel<?>> getAll() {
 
-        List<EntityModel<Book>> books = new ArrayList<EntityModel<Book>>();
-        books.add(entity);
+        List<EntityModel<?>> books = booksService.getAll();
 
         return CollectionModel.of(books, linkTo(methodOn(BooksController.class).getAll()).withSelfRel());
     }
 
+    /**
+     * <p>
+     * Gets books by id
+     * <p>
+     * 
+     * @param id id of the book to retrieve
+     * @return the book
+     */
     @GetMapping(path = "/books/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") String id) {
-        EntityModel<Book> entity = EntityModel.of(getMockBook());
+        EntityModel<?> entity = booksService.getById(id);
+
+        if (entity == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(entity);
     }
 
+    /**
+     * <p>
+     * Searches for all books based on the provided criteria
+     * </p>
+     * 
+     * @param request the search request parameters
+     * @return all books that match the search criteria
+     */
     @PostMapping(path = "/books/search")
-    public CollectionModel<EntityModel<Book>> search(@RequestBody Book request) {
-        EntityModel<Book> entity = EntityModel.of(getMockBook());
-
-        List<EntityModel<Book>> books = new ArrayList<EntityModel<Book>>();
-        books.add(entity);
+    public CollectionModel<EntityModel<?>> search(@Valid @RequestBody Search request) {
+        List<EntityModel<?>> books = booksService.search(request);
 
         return CollectionModel.of(books, linkTo(methodOn(BooksController.class).search(request)).withSelfRel());
     }
 
+    /**
+     * <p>
+     * Saves a book in the repository
+     * <p>
+     * 
+     * @param book the book to save
+     * @return the book that was saved
+     */
     @PostMapping(path = "/books")
-    public ResponseEntity<?> add(@RequestBody Book book) {
-        EntityModel<Book> entity = EntityModel.of(book);
+    public ResponseEntity<?> add(@Valid @RequestBody Book book) {
+        EntityModel<?> entity = booksService.add(book);
 
         return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
     }
 
+    /**
+     * <p>
+     * Updates a book in the repository by the provided id
+     * </p>
+     * 
+     * @param id   the id of the book
+     * @param book the book to update
+     * @return the updated book
+     */
     @PutMapping(path = "/books/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") String id, @RequestBody Book book) {
-        EntityModel<Book> entity = EntityModel.of(book);
+    public ResponseEntity<?> update(@PathVariable("id") String id, @Valid @RequestBody Book book) {
+        EntityModel<?> entity = booksService.update(id, book);
 
         return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
     }
 
+    /**
+     * <p>
+     * Deletes the book associated with the provided id
+     * </p>
+     * 
+     * @param id the id of the book to delete
+     */
     @DeleteMapping(path = "/books/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") String id) {
+        booksService.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * <p>
+     * Deletes all books in the repository
+     * </p>
+     */
     @DeleteMapping(path = "/books")
     public ResponseEntity<?> deleteAll() {
+        booksService.deleteAll();
+
         return ResponseEntity.noContent().build();
-    }
-
-    private Book getMockBook() {
-        Author author = Author.builder()
-                .id("1")
-                .name(Name.builder().firstName("George").middleName("Michael").lastName("Bluth").build())
-                .dateOfBirth(new GregorianCalendar(1987, Calendar.JULY, 13).getTime())
-                .city("Modesto")
-                .state("CA")
-                .build();
-
-        Author[] authors = { author };
-
-        return Book.builder()
-                .id("1")
-                .isbn("000-5555523")
-                .title("My Awesome Book")
-                .authors(authors)
-                .pages(351)
-                .genres(new String[] { "non-fiction", "autobiography" })
-                .publishedDate(new Date())
-                .publisher(Publisher.builder().id("1").name("McGraw").build())
-                .build();
     }
 }

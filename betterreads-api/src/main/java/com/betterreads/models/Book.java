@@ -10,12 +10,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 /**
+ * <p>
  * A document that represents a Book
+ * </p>
  */
 @Document(collection = "books")
 @Data
@@ -25,10 +29,13 @@ public class Book {
     @Id
     public String id;
 
+    @NotBlank(message = "ISBN is required")
     public String isbn;
 
+    @NotBlank(message = "Title is required")
     public String title;
 
+    @NotEmpty(message = "At least 1 Author is required")
     public Author[] authors;
 
     public Date publishedDate;

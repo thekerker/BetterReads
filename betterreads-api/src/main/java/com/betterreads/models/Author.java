@@ -8,12 +8,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 /**
+ * <p>
  * A document that represents an Author
+ * </p>
  */
 @Document(collection = "authors")
 @Data
@@ -24,6 +28,7 @@ public class Author {
     @Id
     public String id;
 
+    @NotEmpty(message = "Name is required")
     public Name name;
 
     private Date dateOfBirth;
@@ -52,6 +57,7 @@ public class Author {
 
         private String middleName;
 
+        @NotBlank(message = "Last Name is required")
         private String lastName;
 
         private String suffix;

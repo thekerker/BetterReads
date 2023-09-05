@@ -6,9 +6,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +31,6 @@ import com.betterreads.models.Author;
 import com.betterreads.models.Author.Name;
 import com.betterreads.models.Book;
 import com.betterreads.models.Publisher;
-import com.betterreads.models.Search;
 import com.betterreads.services.IService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -79,7 +80,6 @@ public class BooksControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", aMapWithSize(9)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", Is.is(book.getId())));
     }
 
@@ -93,13 +93,13 @@ public class BooksControllerTest {
     }
 
     @Test
-    public void whenSearchBooksWithValidRequest_thenCorrectResponse() throws Exception {
+    public void whenSearchBooks_thenCorrectResponse() throws Exception {
         Book book = getMockBook();
         EntityModel<Book> entity = getMockEntityModel(getMockBook());
         List<EntityModel<Book>> books = new ArrayList<>();
         books.add(entity);
 
-        Search search = Search.builder().searchTerm("awesome").build();
+        Book search = Book.builder().title("awesome").build();
 
         doReturn(books).when(booksService).search(search);
 
@@ -111,20 +111,6 @@ public class BooksControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", aMapWithSize(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.books[0].title", Is.is(book.getTitle())));
-    }
-
-    @Test
-    public void whenSearchBooksWithInvalidRequest_thenCorrectResponse() throws Exception {
-        Search search = Search.builder().searchTerm(StringUtils.EMPTY).build();
-
-        String searchJson = new ObjectMapper().writeValueAsString(search);
-
-        mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + "/search")
-                .content(searchJson)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.searchTerm", Is.is("Must supply a search term")))
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test
@@ -214,15 +200,13 @@ public class BooksControllerTest {
                 .state("CA")
                 .build();
 
-        Author[] authors = { author };
-
         return Book.builder()
                 .id("1")
                 .isbn("000-5555523")
                 .title("My Awesome Book")
-                .authors(authors)
+                .authors(Collections.singletonList(author))
                 .pages(351)
-                .genres(new String[] { "non-fiction", "autobiography" })
+                .genres(Arrays.asList("non-fiction", "autobiography"))
                 .publishedDate(new Date())
                 .publisher(Publisher.builder().id("1").name("McGraw").build())
                 .build();

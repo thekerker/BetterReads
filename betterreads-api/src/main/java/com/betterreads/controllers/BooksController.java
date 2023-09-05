@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.betterreads.models.Book;
-import com.betterreads.models.Search;
 import com.betterreads.services.IService;
 
 import jakarta.validation.Valid;
@@ -78,7 +77,7 @@ public class BooksController extends BaseController {
      * @return all books that match the search criteria
      */
     @PostMapping(path = "/books/search")
-    public CollectionModel<EntityModel<?>> search(@Valid @RequestBody Search request) {
+    public CollectionModel<EntityModel<?>> search(@RequestBody Book request) {
         List<EntityModel<?>> books = booksService.search(request);
 
         return CollectionModel.of(books, linkTo(methodOn(BooksController.class).search(request)).withSelfRel());

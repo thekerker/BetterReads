@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.hateoas.EntityModel;
 
-import com.betterreads.models.Search;
-
 /**
  * <p>
  * Interface for services that provide basic CRUD operations
@@ -40,7 +38,7 @@ public interface IService {
      * @param request The search request
      * @return List of documents
      */
-    List<EntityModel<?>> search(Search request);
+    List<EntityModel<?>> search(Object request);
 
     /**
      * <p>

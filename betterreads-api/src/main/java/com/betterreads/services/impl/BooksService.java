@@ -3,8 +3,6 @@ package com.betterreads.services.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -17,7 +15,6 @@ import com.betterreads.repositories.BooksRepository;
 import com.betterreads.models.Book;
 import com.betterreads.services.IService;
 
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**

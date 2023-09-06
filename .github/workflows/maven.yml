@@ -30,6 +30,10 @@ jobs:
           java-version: '20'
           distribution: 'temurin'
           cache: maven
+      - name: Decrypt application.sensitive.yml
+        run: ./src/main/scripts/decrypt_secrets.sh
+        env:
+          APPLICATION_YML_PASSPHRASE: ${{ secrets.APPLICATION_YML_PASSPHRASE }}
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 

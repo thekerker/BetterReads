@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 
@@ -16,11 +15,14 @@ import com.betterreads.models.Book;
 import com.betterreads.models.Publisher;
 import com.betterreads.models.Author.Name;
 
-@SpringBootTest
 public class BooksAssemblerTest {
 
-    @Autowired
     private BooksAssembler assembler;
+
+    @BeforeEach
+    public void setupTests() {
+        assembler = new BooksAssembler();
+    }
 
     @Test
     public void whenToModel_thenCorrectResponse() {
@@ -51,7 +53,7 @@ public class BooksAssemblerTest {
         assertEquals("Prison Publishing", entity.getContent().getPublisher().getName());
 
         assertEquals(2, entity.getLinks().toList().size());
-        assertEquals("http://localhost/v1/books/1", entity.getLinks().getLink(IanaLinkRelations.SELF).get().getHref());
-        assertEquals("http://localhost/v1/books", entity.getLinks().getLink("v1/books").get().getHref());
+        assertEquals("/v1/books/1", entity.getLinks().getLink(IanaLinkRelations.SELF).get().getHref());
+        assertEquals("/v1/books", entity.getLinks().getLink("v1/books").get().getHref());
     }
 }

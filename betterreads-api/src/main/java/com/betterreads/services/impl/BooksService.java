@@ -1,19 +1,18 @@
 package com.betterreads.services.impl;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
-import com.betterreads.models.Author;
-import com.betterreads.models.Author.Name;
+import com.betterreads.assemblers.BooksAssembler;
+import com.betterreads.exceptions.ItemNotFoundException;
+import com.betterreads.repositories.BooksRepository;
 import com.betterreads.models.Book;
-import com.betterreads.models.Publisher;
-import com.betterreads.models.Search;
 import com.betterreads.services.IService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BooksService implements IService {
 
+    @Autowired
+    private BooksRepository repository;
+
+    @Autowired
+    private BooksAssembler assembler;
+
     /**
      * <p>
      * Gets all books
@@ -36,12 +41,7 @@ public class BooksService implements IService {
      */
     @Override
     public List<EntityModel<?>> getAll() {
-        EntityModel<Book> entity = EntityModel.of(getMockBook());
-
-        List<EntityModel<?>> books = new ArrayList<EntityModel<?>>();
-        books.add(entity);
-
-        return books;
+        return repository.findAll().stream().map(assembler::toModel).collect(Collectors.toList());
     }
 
     /**
@@ -50,13 +50,13 @@ public class BooksService implements IService {
      * </p>
      * 
      * @param id the books's id in the database
-     * @return List of books
+     * @return The book
      */
     @Override
     public EntityModel<?> getById(String id) {
-        EntityModel<?> entity = EntityModel.of(getMockBook());
+        Book book = repository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
 
-        return entity;
+        return assembler.toModel(book);
     }
 
     /**
@@ -68,13 +68,12 @@ public class BooksService implements IService {
      * @return List of books
      */
     @Override
-    public List<EntityModel<?>> search(Search request) {
-        EntityModel<Book> bookEntity = EntityModel.of(getMockBook());
+    public List<EntityModel<?>> search(Object request) {
+        Book book = (Book) request;
+        ExampleMatcher matcher = ExampleMatcher.matchingAny().withIgnoreCase();
+        Example<Book> example = Example.of(book, matcher);
 
-        List<EntityModel<?>> books = new ArrayList<EntityModel<?>>();
-        books.add(bookEntity);
-
-        return books;
+        return repository.findAll(example).stream().map(assembler::toModel).collect(Collectors.toList());
     }
 
     /**
@@ -87,9 +86,11 @@ public class BooksService implements IService {
      */
     @Override
     public EntityModel<?> add(Object entity) {
-        EntityModel<Book> bookEntity = EntityModel.of((Book) entity);
+        Book saved = repository.save((Book) entity);
 
-        return bookEntity;
+        log.info("Saved book with id " + saved.getId());
+
+        return assembler.toModel(saved);
     }
 
     /**
@@ -103,9 +104,22 @@ public class BooksService implements IService {
      */
     @Override
     public EntityModel<?> update(String id, Object entity) {
-        EntityModel<Book> bookEntity = EntityModel.of((Book) entity);
+        Book update = (Book) entity;
+        Book updated = repository.findById(id).map(book -> {
+            book.setAuthors(update.getAuthors());
+            book.setTitle(update.getTitle());
+            book.setIsbn(update.getIsbn());
+            book.setGenres(update.getGenres());
+            book.setPages(update.getPages());
+            book.setPublishedDate(update.getPublishedDate());
+            book.setPublisher(update.getPublisher());
+            book.setLanguage(update.getLanguage());
+            return repository.save(book);
+        }).orElseThrow(() -> new ItemNotFoundException(id));
 
-        return bookEntity;
+        log.info("Updated book with id " + id);
+
+        return assembler.toModel(updated);
     }
 
     /**
@@ -118,6 +132,8 @@ public class BooksService implements IService {
     @Override
     public void delete(String id) {
         log.info("Deleted book with id " + id);
+
+        repository.deleteById(id);
     }
 
     /**
@@ -128,29 +144,8 @@ public class BooksService implements IService {
     @Override
     public void deleteAll() {
         log.info("Deleted all books");
-    }
 
-    private Book getMockBook() {
-        Author author = Author.builder()
-                .id("1")
-                .name(Name.builder().firstName("George").middleName("Michael").lastName("Bluth").build())
-                .dateOfBirth(new GregorianCalendar(1987, Calendar.JULY, 13).getTime())
-                .city("Modesto")
-                .state("CA")
-                .build();
-
-        Author[] authors = { author };
-
-        return Book.builder()
-                .id("1")
-                .isbn("000-5555523")
-                .title("My Awesome Book")
-                .authors(authors)
-                .pages(351)
-                .genres(new String[] { "non-fiction", "autobiography" })
-                .publishedDate(new Date())
-                .publisher(Publisher.builder().id("1").name("McGraw").build())
-                .build();
+        repository.deleteAll();
     }
 
 }

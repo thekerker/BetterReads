@@ -196,6 +196,8 @@
         <version>0.8.10</version>
         <configuration>
           <excludes>
+            <exclude>com/betterreads/configurations/*</exclude>
+            <exclude>com/betterreads/exceptions/*</exclude>
             <exclude>com/betterreads/models/*</exclude>
             <exclude>com/betterreads/repositories/*</exclude>
             <exclude>com/betterreads/Application.class</exclude>

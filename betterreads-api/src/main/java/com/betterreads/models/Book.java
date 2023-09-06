@@ -2,12 +2,13 @@ package com.betterreads.models;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotBlank;
@@ -27,37 +28,41 @@ import lombok.Data;
 @Builder
 public class Book {
     @Id
-    public String id;
+    private String id;
 
     @NotBlank(message = "ISBN is required")
-    public String isbn;
+    private String isbn;
 
     @NotBlank(message = "Title is required")
     public String title;
 
+    @DBRef(db = "authors")
     @NotEmpty(message = "At least 1 Author is required")
-    public Author[] authors;
+    private List<Author> authors;
 
-    public Date publishedDate;
+    private Date publishedDate;
 
-    public String[] genres;
+    private List<String> genres;
 
-    public int pages;
+    private int pages;
 
-    public Publisher publisher;
+    @DBRef(db = "publishers")
+    private Publisher publisher;
+
+    private String language;
 
     @Override
     public String toString() {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         String pubDate = this.publishedDate != null ? df.format(this.publishedDate) : StringUtils.EMPTY;
 
-        String formattedAuthors = Arrays.stream(authors)
+        String formattedAuthors = authors.stream()
                 .map(a -> a.getName().toString())
                 .collect(Collectors.joining("; "));
 
         return "Book: [Id:" + this.id + ", ISBN: " + this.isbn + ", Title: " + this.title +
                 ", Author(s): " + formattedAuthors + ", Date Published: " + pubDate +
                 ", Number of Pages: " + this.pages + ", Genres: " + String.join(",", genres) +
-                ", Publisher: " + this.publisher.getName() + "]";
+                ", Publisher: " + this.publisher.getName() + ", Language: " + language + "]";
     }
 }

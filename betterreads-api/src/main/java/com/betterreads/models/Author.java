@@ -26,10 +26,10 @@ import lombok.Data;
 public class Author {
 
     @Id
-    public String id;
+    private String id;
 
     @NotEmpty(message = "Name is required")
-    public Name name;
+    private Name name;
 
     private Date dateOfBirth;
 

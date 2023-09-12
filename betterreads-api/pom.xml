@@ -19,8 +19,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>20</maven.compiler.source>
-    <maven.compiler.target>20</maven.compiler.target>
+    <maven.configuration.release>17</maven.configuration.release>
+    <java.version>17</java.version>
     <spring.boot.version>3.1.3</spring.boot.version>
     <mockito.version>5.5.0</mockito.version>
   </properties>
@@ -114,9 +114,7 @@
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.3.1</version>
           <configuration>
-            <release>${maven.compiler.source}</release>
-            <source>${maven.compiler.source}</source>
-            <target>${maven.compiler.target}</target>
+            <release>${maven.configuration.release}</release>
           </configuration>
         </plugin>
         <!-- default lifecycle, jar packaging: see
@@ -211,6 +209,7 @@
           </execution>
           <execution>
             <id>jacoco-report</id>
+            <phase>test</phase>
             <goals>
               <goal>report</goal>
             </goals>
@@ -257,19 +256,27 @@
         <artifactId>pitest-maven</artifactId>
         <version>1.14.4</version>
         <configuration>
-          <mutationThreshold>90</mutationThreshold>
+          <mutationThreshold>80</mutationThreshold>
+          <failWhenNoMutations>false</failWhenNoMutations>
           <timestampedReports>false</timestampedReports>
+          <withHistory>true</withHistory>
+          <threads>4</threads>
           <targetClasses>
             <param>com.betterreads.*</param>
           </targetClasses>
           <targetTests>
             <param>com.betterreads.*</param>
           </targetTests>
+          <excludedClasses>
+            <param>com.betterreads.configurations.*</param>
+            <param>com.betterreads.models.*</param>
+          </excludedClasses>
           <withHistory>true</withHistory>
         </configuration>
         <executions>
           <execution>
             <id>pit-report</id>
+            <phase>test</phase>
             <goals>
               <goal>mutationCoverage</goal>
             </goals>

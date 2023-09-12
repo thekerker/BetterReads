@@ -8,11 +8,10 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,8 +35,7 @@ public class Book {
     @NotBlank(message = "Title is required")
     public String title;
 
-    @DBRef(db = "authors")
-    @NotEmpty(message = "At least 1 Author is required")
+    @DocumentReference(lazy = true)
     private List<Author> authors;
 
     private Date publishedDate;
@@ -46,7 +44,7 @@ public class Book {
 
     private int pages;
 
-    @DBRef(db = "publishers")
+    @DocumentReference(lazy = true)
     private Publisher publisher;
 
     private String language;

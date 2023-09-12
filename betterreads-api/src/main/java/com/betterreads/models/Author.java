@@ -3,10 +3,13 @@ package com.betterreads.models;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -44,15 +47,21 @@ public class Author {
 
     private String state;
 
+    @DocumentReference
+    private List<Book> books;
+
     @Override
     public String toString() {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         String dob = this.dateOfBirth != null ? df.format(this.dateOfBirth) : StringUtils.EMPTY;
         String name = getFormattedName();
 
+        String bookList = String.join(",", books.stream().map(x -> x.getTitle()).collect(Collectors.toList()));
+
         return "Author: [Id: " + this.getId() + ", Name: " + name +
                 ", Date of Birth: " + dob + ", Gender: " + this.getGender() +
-                ", Location: " + this.getCity() + ", " + this.getState() + "]";
+                ", Location: " + this.getCity() + ", " + this.getState() +
+                ", Books: " + bookList + "]";
     }
 
     public String getFormattedName() {

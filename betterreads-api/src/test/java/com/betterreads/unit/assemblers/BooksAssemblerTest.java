@@ -13,7 +13,6 @@ import com.betterreads.assemblers.BooksAssembler;
 import com.betterreads.models.Author;
 import com.betterreads.models.Book;
 import com.betterreads.models.Publisher;
-import com.betterreads.models.Author.Name;
 
 public class BooksAssemblerTest {
 
@@ -28,7 +27,9 @@ public class BooksAssemblerTest {
     public void whenToModel_thenCorrectResponse() {
         Author author = Author.builder()
                 .id("1")
-                .name(Name.builder().firstName("George").lastName("Bluth").suffix("Sr").build())
+                .firstName("George")
+                .lastName("Bluth")
+                .suffix("Sr")
                 .build();
 
         Book book = Book.builder()
@@ -46,9 +47,9 @@ public class BooksAssemblerTest {
         assertEquals("Caged Wisdom", entity.getContent().getTitle());
         assertEquals(1, entity.getContent().getAuthors().size());
         assertEquals("1", entity.getContent().getAuthors().get(0).getId());
-        assertEquals("George", entity.getContent().getAuthors().get(0).getName().getFirstName());
-        assertEquals("Bluth", entity.getContent().getAuthors().get(0).getName().getLastName());
-        assertEquals("Sr", entity.getContent().getAuthors().get(0).getName().getSuffix());
+        assertEquals("George", entity.getContent().getAuthors().get(0).getFirstName());
+        assertEquals("Bluth", entity.getContent().getAuthors().get(0).getLastName());
+        assertEquals("Sr", entity.getContent().getAuthors().get(0).getSuffix());
         assertEquals("1", entity.getContent().getPublisher().getId());
         assertEquals("Prison Publishing", entity.getContent().getPublisher().getName());
 

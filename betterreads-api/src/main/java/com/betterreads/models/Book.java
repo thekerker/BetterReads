@@ -57,7 +57,7 @@ public class Book {
         String pubDate = this.publishedDate != null ? df.format(this.publishedDate) : StringUtils.EMPTY;
 
         String formattedAuthors = authors.stream()
-                .map(a -> a.getName().toString())
+                .map(a -> a.getFormattedName())
                 .collect(Collectors.joining("; "));
 
         return "Book: [Id:" + this.id + ", ISBN: " + this.isbn + ", Title: " + this.title +

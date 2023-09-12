@@ -270,6 +270,7 @@
           <excludedClasses>
             <param>com.betterreads.configurations.*</param>
             <param>com.betterreads.models.*</param>
+            <param>com.betterreads.Application.class</param>
           </excludedClasses>
           <withHistory>true</withHistory>
         </configuration>

@@ -6,11 +6,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,10 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.betterreads.controllers.BooksController;
+import com.betterreads.controllers.AuthorsController;
 import com.betterreads.models.Author;
-import com.betterreads.models.Book;
-import com.betterreads.models.Publisher;
 import com.betterreads.services.IService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,53 +33,54 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @WebMvcTest
 @AutoConfigureMockMvc
-public class BooksControllerTest {
+public class AuthorsControllerTest {
 
     private static final String MEDIA_TYPE_APPLICATION_HAL_JSON = "application/hal+json";
 
-    private static final String BASE_URL = "/v1/books";
+    private static final String BASE_URL = "/v1/authors";
 
     @MockBean
-    private IService booksService;
+    private IService authorsService;
 
     @Autowired
-    BooksController controller;
+    AuthorsController controller;
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    public void whenGetAllBooks_thenCorrectResponse() throws Exception {
-        Book book = getMockBook();
-        EntityModel<Book> entity = getMockEntityModel(book);
-        List<EntityModel<Book>> books = new ArrayList<>();
-        books.add(entity);
+    public void whenGetAllAuthors_thenCorrectResponse() throws Exception {
+        Author author = getMockAuthor();
+        EntityModel<Author> entity = getMockEntityModel(author);
+        List<EntityModel<Author>> Authors = new ArrayList<>();
+        Authors.add(entity);
 
-        doReturn(books).when(booksService).getAll();
+        doReturn(Authors).when(authorsService).getAll();
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", aMapWithSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.books[0].title", Is.is(book.getTitle())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.authors[0].firstName",
+                        Is.is(author.getFirstName())));
     }
 
     @Test
-    public void whenGetBookById_thenCorrectResponse() throws Exception {
-        Book book = getMockBook();
-        EntityModel<Book> entity = getMockEntityModel(book);
+    public void whenGetAuthorById_thenCorrectResponse() throws Exception {
+        Author author = getMockAuthor();
+        EntityModel<Author> entity = getMockEntityModel(author);
 
-        doReturn(entity).when(booksService).getById("1");
+        doReturn(entity).when(authorsService).getById("1");
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Is.is(book.getId())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Is.is(author.getId())));
     }
 
     @Test
-    public void whenGetBookById_notFound_thenCorrectResponse() throws Exception {
-        doReturn(null).when(booksService).getById("1");
+    public void whenGetAuthorById_notFound_thenCorrectResponse() throws Exception {
+        doReturn(null).when(authorsService).getById("1");
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/1")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -92,15 +88,15 @@ public class BooksControllerTest {
     }
 
     @Test
-    public void whenSearchBooks_thenCorrectResponse() throws Exception {
-        Book book = getMockBook();
-        EntityModel<Book> entity = getMockEntityModel(getMockBook());
-        List<EntityModel<Book>> books = new ArrayList<>();
-        books.add(entity);
+    public void whenSearchAuthors_thenCorrectResponse() throws Exception {
+        Author author = getMockAuthor();
+        EntityModel<Author> entity = getMockEntityModel(getMockAuthor());
+        List<EntityModel<Author>> Authors = new ArrayList<>();
+        Authors.add(entity);
 
-        Book search = Book.builder().title("awesome").build();
+        Author search = Author.builder().city("modesto").build();
 
-        doReturn(books).when(booksService).search(search);
+        doReturn(Authors).when(authorsService).search(search);
 
         String searchJson = new ObjectMapper().writeValueAsString(search);
 
@@ -109,72 +105,72 @@ public class BooksControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", aMapWithSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.books[0].title", Is.is(book.getTitle())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.authors[0].city", Is.is(author.getCity())));
     }
 
     @Test
-    public void whenAddBookWithValidRequest_thenCorrectResponse() throws Exception {
-        Book book = getMockBook();
-        String bookJson = new ObjectMapper().writeValueAsString(book);
+    public void whenAddAuthorWithValidRequest_thenCorrectResponse() throws Exception {
+        Author author = getMockAuthor();
+        String authorJson = new ObjectMapper().writeValueAsString(author);
 
-        EntityModel<Book> expected = getMockEntityModel(book);
+        EntityModel<Author> expected = getMockEntityModel(author);
 
-        doReturn(expected).when(booksService).add(book);
+        doReturn(expected).when(authorsService).add(author);
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
-                .content(bookJson)
+                .content(authorJson)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MEDIA_TYPE_APPLICATION_HAL_JSON));
     }
 
     @Test
-    public void whenAddBookWithInvalidRequest_thenCorrectResponse() throws Exception {
-        Book book = getMockBook();
-        book.setIsbn(StringUtils.EMPTY);
-        String bookJson = new ObjectMapper().writeValueAsString(book);
+    public void whenAddAuthorWithInvalidRequest_thenCorrectResponse() throws Exception {
+        Author author = getMockAuthor();
+        author.setLastName(StringUtils.EMPTY);
+        String authorJson = new ObjectMapper().writeValueAsString(author);
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
-                .content(bookJson)
+                .content(authorJson)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.isbn", Is.is("ISBN is required")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", Is.is("Last Name is required")))
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test
-    public void whenUpdateBookWithValidRequest_thenCorrectResponse() throws Exception {
-        Book book = getMockBook();
-        String bookJson = new ObjectMapper().writeValueAsString(book);
+    public void whenUpdateAuthorWithValidRequest_thenCorrectResponse() throws Exception {
+        Author author = getMockAuthor();
+        String authorJson = new ObjectMapper().writeValueAsString(author);
 
-        EntityModel<Book> expected = getMockEntityModel(book);
+        EntityModel<Author> expected = getMockEntityModel(author);
 
-        doReturn(expected).when(booksService).update("1", book);
+        doReturn(expected).when(authorsService).update("1", author);
 
         mockMvc.perform(MockMvcRequestBuilders.put(BASE_URL + "/1")
-                .content(bookJson)
+                .content(authorJson)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MEDIA_TYPE_APPLICATION_HAL_JSON));
     }
 
     @Test
-    public void whenUpdateBookWithInvalidRequest_thenCorrectResponse() throws Exception {
-        Book book = getMockBook();
-        book.setIsbn(StringUtils.EMPTY);
-        String bookJson = new ObjectMapper().writeValueAsString(book);
+    public void whenUpdateAuthorWithInvalidRequest_thenCorrectResponse() throws Exception {
+        Author author = getMockAuthor();
+        author.setLastName(StringUtils.EMPTY);
+        String authorJson = new ObjectMapper().writeValueAsString(author);
 
         mockMvc.perform(MockMvcRequestBuilders.put(BASE_URL + "/1")
-                .content(bookJson)
+                .content(authorJson)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.isbn", Is.is("ISBN is required")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", Is.is("Last Name is required")))
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test
-    public void whenDeleteBookWithId_thenCorrectResponse() throws Exception {
-        doNothing().when(booksService).delete("1");
+    public void whenDeleteAuthorWithId_thenCorrectResponse() throws Exception {
+        doNothing().when(authorsService).delete("1");
 
         mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/1")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -182,16 +178,16 @@ public class BooksControllerTest {
     }
 
     @Test
-    public void whenDeleteAllBooks_thenCorrectResponse() throws Exception {
-        doNothing().when(booksService).deleteAll();
+    public void whenDeleteAllAuthors_thenCorrectResponse() throws Exception {
+        doNothing().when(authorsService).deleteAll();
 
         mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
-    private Book getMockBook() {
-        Author author = Author.builder()
+    private Author getMockAuthor() {
+        return Author.builder()
                 .id("1")
                 .firstName("George")
                 .middleName("Michael")
@@ -200,21 +196,10 @@ public class BooksControllerTest {
                 .city("Modesto")
                 .state("CA")
                 .build();
-
-        return Book.builder()
-                .id("1")
-                .isbn("000-5555523")
-                .title("My Awesome Book")
-                .authors(Collections.singletonList(author))
-                .pages(351)
-                .genres(Arrays.asList("non-fiction", "autobiography"))
-                .publishedDate(new Date())
-                .publisher(Publisher.builder().id("1").name("McGraw").build())
-                .build();
     }
 
-    public EntityModel<Book> getMockEntityModel(Book entity) {
-        return EntityModel.of(entity, linkTo(methodOn(BooksController.class).getById(entity.getId())).withSelfRel(),
-                linkTo(methodOn(BooksController.class).getAll()).withRel("v1/books"));
+    public EntityModel<Author> getMockEntityModel(Author entity) {
+        return EntityModel.of(entity, linkTo(methodOn(AuthorsController.class).getById(entity.getId())).withSelfRel(),
+                linkTo(methodOn(AuthorsController.class).getAll()).withRel("v1/Authors"));
     }
 }

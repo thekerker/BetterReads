@@ -9,7 +9,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,8 +27,14 @@ public class Author {
     @Id
     private String id;
 
-    @NotEmpty(message = "Name is required")
-    private Name name;
+    private String firstName;
+
+    private String middleName;
+
+    @NotBlank(message = "Last Name is required")
+    private String lastName;
+
+    private String suffix;
 
     private Date dateOfBirth;
 
@@ -43,44 +48,30 @@ public class Author {
     public String toString() {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         String dob = this.dateOfBirth != null ? df.format(this.dateOfBirth) : StringUtils.EMPTY;
+        String name = getFormattedName();
 
-        return "Author: [Id: " + this.getId() + ", Name: " + this.name.toString() +
+        return "Author: [Id: " + this.getId() + ", Name: " + name +
                 ", Date of Birth: " + dob + ", Gender: " + this.getGender() +
                 ", Location: " + this.getCity() + ", " + this.getState() + "]";
     }
 
-    @Data
-    @AllArgsConstructor
-    @Builder
-    public static class Name {
-        private String firstName;
+    public String getFormattedName() {
+        StringBuilder sb = new StringBuilder();
 
-        private String middleName;
+        sb.append(this.lastName);
 
-        @NotBlank(message = "Last Name is required")
-        private String lastName;
-
-        private String suffix;
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append(this.lastName);
-
-            if (StringUtils.isNotBlank(this.suffix)) {
-                sb.append(" ").append(this.suffix);
-            }
-
-            if (StringUtils.isNotBlank(this.firstName)) {
-                sb.append(", ").append(this.firstName);
-
-                if (StringUtils.isNotBlank(this.middleName)) {
-                    sb.append(" ").append(this.middleName);
-                }
-            }
-
-            return sb.toString();
+        if (StringUtils.isNotBlank(this.suffix)) {
+            sb.append(" ").append(this.suffix);
         }
+
+        if (StringUtils.isNotBlank(this.firstName)) {
+            sb.append(", ").append(this.firstName);
+
+            if (StringUtils.isNotBlank(this.middleName)) {
+                sb.append(" ").append(this.middleName);
+            }
+        }
+
+        return sb.toString();
     }
 }

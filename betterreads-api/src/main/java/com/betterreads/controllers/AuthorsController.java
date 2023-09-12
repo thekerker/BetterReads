@@ -1,10 +1,8 @@
 package com.betterreads.controllers;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -15,74 +13,129 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.betterreads.models.Author;
-import com.betterreads.models.Author.Name;
+import com.betterreads.services.IService;
+
+import jakarta.validation.Valid;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * API for handling authors
+ */
 @RestController
-public class AuthorsController {
-    @GetMapping(path = "/authors")
-    public CollectionModel<EntityModel<Author>> getAll() {
-        EntityModel<Author> entity = EntityModel.of(getMockAuthor());
+@RequestMapping("/v1")
+public class AuthorsController extends BaseController {
 
-        List<EntityModel<Author>> authors = new ArrayList<EntityModel<Author>>();
-        authors.add(entity);
+    @Autowired
+    private IService authorsService;
+
+    /**
+     * <p>
+     * Gets authors from the data store
+     * </p>
+     * 
+     * @return all authors
+     */
+    @GetMapping(path = "/authors")
+    public CollectionModel<EntityModel<?>> getAll() {
+        List<EntityModel<?>> authors = authorsService.getAll();
 
         return CollectionModel.of(authors, linkTo(methodOn(AuthorsController.class).getAll()).withSelfRel());
     }
 
+    /**
+     * <p>
+     * Gets authors by id
+     * <p>
+     * 
+     * @param id id of the author to retrieve
+     * @return the author
+     */
     @GetMapping(path = "/authors/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") String id) {
-        EntityModel<Author> entity = EntityModel.of(getMockAuthor());
+        EntityModel<?> entity = authorsService.getById(id);
+
+        if (entity == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(entity);
     }
 
+    /**
+     * <p>
+     * Searches for all authors based on the provided criteria
+     * </p>
+     * 
+     * @param request the search request parameters
+     * @return all authors that match the search criteria
+     */
     @PostMapping(path = "/authors/search")
-    public CollectionModel<EntityModel<Author>> search(@RequestBody Author request) {
-        EntityModel<Author> entity = EntityModel.of(getMockAuthor());
-
-        List<EntityModel<Author>> authors = new ArrayList<EntityModel<Author>>();
-        authors.add(entity);
+    public CollectionModel<EntityModel<?>> search(@RequestBody Author request) {
+        List<EntityModel<?>> authors = authorsService.search(request);
 
         return CollectionModel.of(authors, linkTo(methodOn(AuthorsController.class).search(request)).withSelfRel());
     }
 
+    /**
+     * <p>
+     * Saves an author in the repository
+     * <p>
+     * 
+     * @param author the author to save
+     * @return the author that was saved
+     */
     @PostMapping(path = "/authors")
-    public ResponseEntity<?> add(@RequestBody Author book) {
-        EntityModel<Author> entity = EntityModel.of(book);
+    public ResponseEntity<?> add(@Valid @RequestBody Author author) {
+        EntityModel<?> entity = authorsService.add(author);
 
         return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
     }
 
+    /**
+     * <p>
+     * Updates an author in the repository by the provided id
+     * </p>
+     * 
+     * @param id     the id of the author
+     * @param author the author to update
+     * @return the updated author
+     */
     @PutMapping(path = "/authors/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") String id, @RequestBody Author book) {
-        EntityModel<Author> entity = EntityModel.of(book);
+    public ResponseEntity<?> update(@PathVariable("id") String id, @Valid @RequestBody Author author) {
+        EntityModel<?> entity = authorsService.update(id, author);
 
         return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
     }
 
+    /**
+     * <p>
+     * Deletes the author associated with the provided id
+     * </p>
+     * 
+     * @param id the id of the author to delete
+     */
     @DeleteMapping(path = "/authors/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") String id) {
+        authorsService.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * <p>
+     * Deletes all authors in the repository
+     * </p>
+     */
     @DeleteMapping(path = "/authors")
     public ResponseEntity<?> deleteAll() {
-        return ResponseEntity.noContent().build();
-    }
+        authorsService.deleteAll();
 
-    private Author getMockAuthor() {
-        return Author.builder()
-                .id("1")
-                .name(Name.builder().firstName("George").middleName("Michael").lastName("Bluth").build())
-                .dateOfBirth(new GregorianCalendar(1987, Calendar.JULY, 13).getTime())
-                .city("Modesto")
-                .state("CA")
-                .build();
+        return ResponseEntity.noContent().build();
     }
 }

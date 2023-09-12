@@ -17,7 +17,6 @@ import org.springframework.hateoas.EntityModel;
 import com.betterreads.assemblers.BooksAssembler;
 import com.betterreads.exceptions.ItemNotFoundException;
 import com.betterreads.models.Author;
-import com.betterreads.models.Author.Name;
 import com.betterreads.models.Book;
 import com.betterreads.models.Publisher;
 import com.betterreads.repositories.BooksRepository;
@@ -214,7 +213,9 @@ public class BooksServiceTest {
     private Book getMockBook() {
         Author author = Author.builder()
                 .id("1")
-                .name(Name.builder().firstName("George").middleName("Michael").lastName("Bluth").build())
+                .firstName("George")
+                .middleName("Michael")
+                .lastName("Bluth")
                 .build();
 
         return Book.builder()

@@ -168,7 +168,7 @@
           </executions>
           <configuration>
             <image>
-              <name>docker.io/nkerker/${project.name}:${project.version}</name>
+              <name>docker.io/${docker.publishRegistry.username}/${project.name}:${project.version}</name>
               <publish>true</publish>
             </image>
             <docker>

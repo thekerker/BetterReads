@@ -114,6 +114,7 @@ public class AuthorsService implements IService {
             author.setDateOfBirth(update.getDateOfBirth());
             author.setCity(update.getCity());
             author.setState(update.getState());
+            author.setBooks(update.getBooks());
             return repository.save(author);
         }).orElseThrow(() -> new ItemNotFoundException(id));
 

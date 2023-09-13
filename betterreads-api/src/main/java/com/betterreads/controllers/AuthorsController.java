@@ -19,6 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.betterreads.models.Author;
 import com.betterreads.services.IService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -41,6 +46,11 @@ public class AuthorsController extends BaseController {
      * 
      * @return all authors
      */
+    @Operation(summary = "Gets all authors from the data store")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found authors", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Author.class)) })
+    })
     @GetMapping(path = "/authors")
     public CollectionModel<EntityModel<?>> getAll() {
         List<EntityModel<?>> authors = authorsService.getAll();
@@ -56,6 +66,14 @@ public class AuthorsController extends BaseController {
      * @param id id of the author to retrieve
      * @return the author
      */
+    @Operation(summary = "Gets an author from the data store by its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the author", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Author.class)) }),
+            @ApiResponse(responseCode = "404", description = "No author found for the id", content = {
+                    @Content
+            })
+    })
     @GetMapping(path = "/authors/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") String id) {
         EntityModel<?> entity = authorsService.getById(id);
@@ -75,6 +93,11 @@ public class AuthorsController extends BaseController {
      * @param request the search request parameters
      * @return all authors that match the search criteria
      */
+    @Operation(summary = "Searches for authors based on a set of criteria")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found results", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Author.class)) })
+    })
     @PostMapping(path = "/authors/search")
     public CollectionModel<EntityModel<?>> search(@RequestBody Author request) {
         List<EntityModel<?>> authors = authorsService.search(request);
@@ -90,6 +113,11 @@ public class AuthorsController extends BaseController {
      * @param author the author to save
      * @return the author that was saved
      */
+    @Operation(summary = "Adds a new author to the data store")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Added the author", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Author.class)) })
+    })
     @PostMapping(path = "/authors")
     public ResponseEntity<?> add(@Valid @RequestBody Author author) {
         EntityModel<?> entity = authorsService.add(author);
@@ -106,6 +134,11 @@ public class AuthorsController extends BaseController {
      * @param author the author to update
      * @return the updated author
      */
+    @Operation(summary = "Updates an author in the data store by its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Updated the author", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Author.class)) })
+    })
     @PutMapping(path = "/authors/{id}")
     public ResponseEntity<?> update(@PathVariable("id") String id, @Valid @RequestBody Author author) {
         EntityModel<?> entity = authorsService.update(id, author);
@@ -120,6 +153,11 @@ public class AuthorsController extends BaseController {
      * 
      * @param id the id of the author to delete
      */
+    @Operation(summary = "Deletes an author from the data store by its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Deleted the author", content = {
+                    @Content })
+    })
     @DeleteMapping(path = "/authors/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") String id) {
         authorsService.delete(id);
@@ -132,6 +170,11 @@ public class AuthorsController extends BaseController {
      * Deletes all authors in the repository
      * </p>
      */
+    @Operation(summary = "Deletes all authors from the data store")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Deleted all books", content = {
+                    @Content })
+    })
     @DeleteMapping(path = "/authors")
     public ResponseEntity<?> deleteAll() {
         authorsService.deleteAll();

@@ -35,13 +35,16 @@ jobs:
         run: ./src/main/scripts/decrypt_secrets.sh
         env:
           APPLICATION_YML_PASSPHRASE: ${{ secrets.APPLICATION_YML_PASSPHRASE }}
-      #- name: Build with Maven
-      #  run: mvn -B package --file pom.xml
-      - name: Build image & push
-        run: ./src/main/scripts/build-spring-boot.sh
-        env:
-          USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Docker Login
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build and Push Docker Image
+        #  run: mvn -B package --file pom.xml
+        run: mvn spring-boot:build-image -Ddocker.publishRegistry.username=${{ secrets.DOCKERHUB_USERNAME }} -Ddocker.publishRegistry.password=${{ secrets.DOCKERHUB_PASSWORD }}
+      #- name: Build image & push
+      #  run: ./src/main/scripts/build-spring-boot.sh
+      #  env:
+      #    USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      #    PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
       - name: Update dependency graph

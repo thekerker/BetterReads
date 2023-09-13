@@ -167,7 +167,16 @@
             </execution>
           </executions>
           <configuration>
-            <imageName>${module.image.name}</imageName>
+            <image>
+              <name>docker.io/nkerker/${project.name}:${project.version}</name>
+              <publish>true</publish>
+            </image>
+            <docker>
+              <publishRegistry>
+                <username>${docker.publishRegistry.username}</username>
+                <password>${docker.publishRegistry.password}</password>
+              </publishRegistry>
+            </docker>
           </configuration>
         </plugin>
         <plugin>

@@ -166,6 +166,9 @@
               </goals>
             </execution>
           </executions>
+          <configuration>
+            <imageName>${module.image.name}</imageName>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.projectlombok</groupId>

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker login "https://index.docker.io/v1/" -u="$USERNAME" -p="$PASSWORD"
+docker login -u="$USERNAME" -p="$PASSWORD"
 
 mvn spring-boot:build-image \
     --batch-mode --no-transfer-progress

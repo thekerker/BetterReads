@@ -25,4 +25,6 @@ replay_pid*
 
 target/
 .vscode/
+.fleet/
+.idea/
 application.sensitive.yml

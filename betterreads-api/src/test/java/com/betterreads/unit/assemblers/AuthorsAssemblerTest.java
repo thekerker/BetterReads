@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ public class AuthorsAssemblerTest {
 
         EntityModel<Author> entity = assembler.toModel(author);
 
-        assertEquals("1", entity.getContent().getId());
+        assertEquals("1", Objects.requireNonNull(entity.getContent()).getId());
         assertEquals("George", entity.getContent().getFirstName());
         assertEquals("Bluth", entity.getContent().getLastName());
         assertEquals("Sr", entity.getContent().getSuffix());

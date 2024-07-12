@@ -26,6 +26,7 @@ public class PublishersAssembler implements RepresentationModelAssembler<Publish
      * @param entity the publisher
      * @return the mapped EntityModel
      */
+    @SuppressWarnings("null")
     @Override
     public EntityModel<Publisher> toModel(Publisher entity) {
         return EntityModel.of(entity,

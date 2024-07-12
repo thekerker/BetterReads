@@ -26,6 +26,7 @@ public class AuthorsAssemblerTest {
         assembler = new AuthorsAssembler();
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenToModel_thenCorrectResponse() {
         List<Book> books = new ArrayList<>();

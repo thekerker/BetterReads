@@ -26,6 +26,7 @@ public class BooksAssembler implements RepresentationModelAssembler<Book, Entity
      * @param entity the book
      * @return the mapped EntityModel
      */
+    @SuppressWarnings("null")
     @Override
     public EntityModel<Book> toModel(Book entity) {
         return EntityModel.of(entity, linkTo(methodOn(BooksController.class).getById(entity.getId())).withSelfRel(),

@@ -26,6 +26,7 @@ public class AuthorsAssembler implements RepresentationModelAssembler<Author, En
      * @param entity the author
      * @return the mapped EntityModel
      */
+    @SuppressWarnings("null")
     @Override
     public EntityModel<Author> toModel(Author entity) {
         return EntityModel.of(entity, linkTo(methodOn(AuthorsController.class).getById(entity.getId())).withSelfRel(),

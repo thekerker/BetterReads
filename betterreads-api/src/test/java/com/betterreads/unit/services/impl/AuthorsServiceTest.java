@@ -44,6 +44,7 @@ public class AuthorsServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenGetAll_thenCorrectResponse() {
         Author author = getMockAuthor();
@@ -67,6 +68,7 @@ public class AuthorsServiceTest {
         verify(assembler).toModel(author);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenGetById_thenCorrectResponse() {
         Author author = getMockAuthor();
@@ -103,6 +105,7 @@ public class AuthorsServiceTest {
         verify(assembler, never()).toModel(any(Author.class));
     }
 
+    @SuppressWarnings({ "null", "unchecked" })
     @Test
     public void whenSearch_thenCorrectResponse() {
         Author author = getMockAuthor();
@@ -128,6 +131,7 @@ public class AuthorsServiceTest {
         verify(assembler).toModel(author);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenAdd_thenCorrectResponse() {
         Author author = getMockAuthor();
@@ -150,6 +154,7 @@ public class AuthorsServiceTest {
         verify(assembler).toModel(author);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenUpdate_thenCorrectResponse() {
         Author author = getMockAuthor();

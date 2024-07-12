@@ -48,6 +48,7 @@ public class BooksServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenGetAll_thenCorrectResponse() {
         Book book = getMockBook();
@@ -70,6 +71,7 @@ public class BooksServiceTest {
         verify(assembler).toModel(book);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenGetById_thenCorrectResponse() {
         Book book = getMockBook();
@@ -105,6 +107,7 @@ public class BooksServiceTest {
         verify(assembler, never()).toModel(any(Book.class));
     }
 
+    @SuppressWarnings({ "unchecked", "null" })
     @Test
     public void whenSearch_thenCorrectResponse() {
         Book book = getMockBook();
@@ -129,6 +132,7 @@ public class BooksServiceTest {
         verify(assembler).toModel(book);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenAdd_thenCorrectResponse() {
         Book book = getMockBook();
@@ -150,6 +154,7 @@ public class BooksServiceTest {
         verify(assembler).toModel(book);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenUpdate_thenCorrectResponse() {
         Book book = getMockBook();

@@ -23,6 +23,7 @@ public class BooksAssemblerTest {
         assembler = new BooksAssembler();
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenToModel_thenCorrectResponse() {
         Author author = Author.builder()

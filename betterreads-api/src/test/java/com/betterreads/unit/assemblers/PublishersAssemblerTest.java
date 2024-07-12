@@ -19,6 +19,7 @@ public class PublishersAssemblerTest {
         assembler = new PublishersAssembler();
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenToModel_thenCorrectResponse() {
         Publisher publisher = Publisher

@@ -1,12 +1,9 @@
 package com.betterreads.unit.services.impl;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,14 +14,12 @@ import org.springframework.hateoas.EntityModel;
 
 import com.betterreads.assemblers.PublishersAssembler;
 import com.betterreads.exceptions.ItemNotFoundException;
-import com.betterreads.models.Author;
 import com.betterreads.models.Publisher;
 import com.betterreads.repositories.PublishersRepository;
 import com.betterreads.services.impl.PublishersService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
@@ -48,6 +43,7 @@ public class PublishersServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenGetAll_thenCorrectResponse() {
         Publisher publisher = getMockPublisher();
@@ -66,6 +62,7 @@ public class PublishersServiceTest {
         verify(assembler).toModel(publisher);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenGetById_thenCorrectResponse() {
         Publisher publisher = getMockPublisher();
@@ -97,6 +94,7 @@ public class PublishersServiceTest {
         verify(assembler, never()).toModel(any(Publisher.class));
     }
 
+    @SuppressWarnings({ "unchecked", "null" })
     @Test
     public void whenSearch_thenCorrectResponse() {
         Publisher publisher = getMockPublisher();
@@ -117,6 +115,7 @@ public class PublishersServiceTest {
         verify(assembler).toModel(publisher);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenAdd_thenCorrectResponse() {
         Publisher publisher = getMockPublisher();
@@ -134,6 +133,7 @@ public class PublishersServiceTest {
         verify(assembler).toModel(publisher);
     }
 
+    @SuppressWarnings("null")
     @Test
     public void whenUpdate_thenCorrectResponse() {
         Publisher publisher = getMockPublisher();

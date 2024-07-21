@@ -1,10 +1,10 @@
 package com.betterreads.unit.services.impl;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
+import com.betterreads.assemblers.AuthorsAssembler;
+import com.betterreads.exceptions.ItemNotFoundException;
+import com.betterreads.models.Author;
+import com.betterreads.repositories.AuthorsRepository;
+import com.betterreads.services.impl.AuthorsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,20 +13,16 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Example;
 import org.springframework.hateoas.EntityModel;
 
-import com.betterreads.assemblers.AuthorsAssembler;
-import com.betterreads.exceptions.ItemNotFoundException;
-import com.betterreads.models.Author;
-import com.betterreads.repositories.AuthorsRepository;
-import com.betterreads.services.impl.AuthorsService;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AuthorsServiceTest {
 
@@ -54,8 +50,9 @@ public class AuthorsServiceTest {
 
         List<EntityModel<?>> actual = service.getAll();
 
-        Author actualAuthor = (Author) actual.get(0).getContent();
+        Author actualAuthor = (Author) actual.getFirst().getContent();
 
+        assert actualAuthor != null;
         assertEquals(author.getId(), actualAuthor.getId());
         assertEquals(author.getFirstName(), actualAuthor.getFirstName());
         assertEquals(author.getMiddleName(), actualAuthor.getMiddleName());
@@ -79,6 +76,7 @@ public class AuthorsServiceTest {
         EntityModel<?> actual = service.getById("1");
         Author actualAuthor = (Author) actual.getContent();
 
+        assert actualAuthor != null;
         assertEquals(author.getId(), actualAuthor.getId());
         assertEquals(author.getFirstName(), actualAuthor.getFirstName());
         assertEquals(author.getMiddleName(), actualAuthor.getMiddleName());
@@ -117,8 +115,9 @@ public class AuthorsServiceTest {
 
         List<EntityModel<?>> actual = service.search(request);
 
-        Author actualAuthor = (Author) actual.get(0).getContent();
+        Author actualAuthor = (Author) actual.getFirst().getContent();
 
+        assert actualAuthor != null;
         assertEquals(author.getId(), actualAuthor.getId());
         assertEquals(author.getFirstName(), actualAuthor.getFirstName());
         assertEquals(author.getMiddleName(), actualAuthor.getMiddleName());
@@ -142,6 +141,7 @@ public class AuthorsServiceTest {
         EntityModel<?> actual = service.add(author);
         Author actualAuthor = (Author) actual.getContent();
 
+        assert actualAuthor != null;
         assertEquals(author.getId(), actualAuthor.getId());
         assertEquals(author.getFirstName(), actualAuthor.getFirstName());
         assertEquals(author.getMiddleName(), actualAuthor.getMiddleName());
@@ -159,16 +159,17 @@ public class AuthorsServiceTest {
     public void whenUpdate_thenCorrectResponse() {
         Author author = getMockAuthor();
 
-        Author authorUpdate = author;
-        authorUpdate.setCity("Los Angeles");
-
         when(repository.findById("1")).thenReturn(Optional.of(author));
         when(repository.save(author)).thenReturn(author);
         when(assembler.toModel(author)).thenReturn(EntityModel.of(author));
 
+        Author authorUpdate = getMockAuthor();
+        authorUpdate.setCity("Los Angeles");
+
         EntityModel<?> actual = service.update("1", authorUpdate);
         Author actualAuthor = (Author) actual.getContent();
 
+        assert actualAuthor != null;
         assertEquals(author.getId(), actualAuthor.getId());
         assertEquals(author.getId(), actualAuthor.getId());
         assertEquals(author.getFirstName(), actualAuthor.getFirstName());

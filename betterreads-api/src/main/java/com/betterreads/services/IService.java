@@ -1,8 +1,8 @@
 package com.betterreads.services;
 
-import java.util.List;
-
 import org.springframework.hateoas.EntityModel;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,7 +13,7 @@ public interface IService {
 
     /**
      * <p>
-     * Gets all documenents
+     * Gets all documents
      * </p>
      * 
      * @return The documents

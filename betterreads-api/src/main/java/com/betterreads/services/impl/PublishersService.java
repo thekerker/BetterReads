@@ -1,21 +1,19 @@
 package com.betterreads.services.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.betterreads.assemblers.PublishersAssembler;
+import com.betterreads.exceptions.ItemNotFoundException;
+import com.betterreads.models.Publisher;
+import com.betterreads.repositories.PublishersRepository;
+import com.betterreads.services.IService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
-import com.betterreads.assemblers.PublishersAssembler;
-import com.betterreads.exceptions.ItemNotFoundException;
-import com.betterreads.repositories.PublishersRepository;
-import com.betterreads.models.Publisher;
-import com.betterreads.services.IService;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -49,7 +47,7 @@ public class PublishersService implements IService {
      * Gets publisher by id
      * </p>
      * 
-     * @param id the publishers's id in the database
+     * @param id the publisher's id in the database
      * @return The publisher
      */
     @Override
@@ -73,7 +71,10 @@ public class PublishersService implements IService {
         ExampleMatcher matcher = ExampleMatcher.matchingAny().withIgnoreCase();
         Example<Publisher> example = Example.of(publisher, matcher);
 
-        return repository.findAll(example).stream().map(assembler::toModel).collect(Collectors.toList());
+        return repository.findAll(example)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -88,7 +89,7 @@ public class PublishersService implements IService {
     public EntityModel<?> add(Object entity) {
         Publisher saved = repository.save((Publisher) entity);
 
-        log.info("Saved publisher with id " + saved.getId());
+        log.info("Saved publisher with id {}", saved.getId());
 
         return assembler.toModel(saved);
     }
@@ -111,7 +112,7 @@ public class PublishersService implements IService {
             return repository.save(publisher);
         }).orElseThrow(() -> new ItemNotFoundException(id));
 
-        log.info("Updated publisher with id " + id);
+        log.info("Updated publisher with id {}", id);
 
         return assembler.toModel(updated);
     }
@@ -125,7 +126,7 @@ public class PublishersService implements IService {
      */
     @Override
     public void delete(String id) {
-        log.info("Deleted publisher with id " + id);
+        log.info("Deleted publisher with id {}", id);
 
         repository.deleteById(id);
     }

@@ -1,14 +1,15 @@
 package com.betterreads.unit.assemblers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import com.betterreads.assemblers.PublishersAssembler;
+import com.betterreads.models.Publisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 
-import com.betterreads.assemblers.PublishersAssembler;
-import com.betterreads.models.Publisher;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PublishersAssemblerTest {
 
@@ -30,11 +31,11 @@ public class PublishersAssemblerTest {
 
         EntityModel<Publisher> entity = assembler.toModel(publisher);
 
-        assertEquals("1", entity.getContent().getId());
+        assertEquals("1", Objects.requireNonNull(entity.getContent()).getId());
         assertEquals("Prison Publishing", entity.getContent().getName());
 
         assertEquals(2, entity.getLinks().toList().size());
-        assertEquals("/v1/publishers/1", entity.getLinks().getLink(IanaLinkRelations.SELF).get().getHref());
-        assertEquals("/v1/publishers", entity.getLinks().getLink("v1/publishers").get().getHref());
+        assertEquals("/v1/publishers/1", Objects.requireNonNull(entity.getLinks().getLink(IanaLinkRelations.SELF).orElse(null)).getHref());
+        assertEquals("/v1/publishers", Objects.requireNonNull(entity.getLinks().getLink("v1/publishers").orElse(null)).getHref());
     }
 }

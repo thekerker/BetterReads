@@ -1,20 +1,19 @@
 package com.betterreads.models;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -56,7 +55,9 @@ public class Author {
         String dob = this.dateOfBirth != null ? df.format(this.dateOfBirth) : StringUtils.EMPTY;
         String name = getFormattedName();
 
-        String bookList = String.join(",", books.stream().map(x -> x.getTitle()).collect(Collectors.toList()));
+        String bookList = books.stream()
+                .map(Book::getTitle)
+                .collect(Collectors.joining(","));
 
         return "Author: [Id: " + this.getId() + ", Name: " + name +
                 ", Date of Birth: " + dob + ", Gender: " + this.getGender() +

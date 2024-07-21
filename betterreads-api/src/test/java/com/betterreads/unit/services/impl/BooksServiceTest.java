@@ -1,11 +1,12 @@
 package com.betterreads.unit.services.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
+import com.betterreads.assemblers.BooksAssembler;
+import com.betterreads.exceptions.ItemNotFoundException;
+import com.betterreads.models.Author;
+import com.betterreads.models.Book;
+import com.betterreads.models.Publisher;
+import com.betterreads.repositories.BooksRepository;
+import com.betterreads.services.impl.BooksService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,23 +15,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Example;
 import org.springframework.hateoas.EntityModel;
 
-import com.betterreads.assemblers.BooksAssembler;
-import com.betterreads.exceptions.ItemNotFoundException;
-import com.betterreads.models.Author;
-import com.betterreads.models.Book;
-import com.betterreads.models.Publisher;
-import com.betterreads.repositories.BooksRepository;
-import com.betterreads.services.impl.BooksService;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class BooksServiceTest {
 
@@ -58,12 +48,13 @@ public class BooksServiceTest {
 
         List<EntityModel<?>> actual = service.getAll();
 
-        Book actualBook = (Book) actual.get(0).getContent();
+        Book actualBook = (Book) actual.getFirst().getContent();
 
+        assert actualBook != null;
         assertEquals(book.getId(), actualBook.getId());
         assertEquals(book.getIsbn(), actualBook.getIsbn());
         assertEquals(book.getTitle(), actualBook.getTitle());
-        assertEquals(book.getAuthors().get(0).getId(), actualBook.getAuthors().get(0).getId());
+        assertEquals(book.getAuthors().getFirst().getId(), actualBook.getAuthors().getFirst().getId());
         assertEquals(book.getPages(), actualBook.getPages());
         assertEquals(book.getPublisher().getId(), actualBook.getPublisher().getId());
 
@@ -82,10 +73,11 @@ public class BooksServiceTest {
         EntityModel<?> actual = service.getById("1");
         Book actualBook = (Book) actual.getContent();
 
+        assert actualBook != null;
         assertEquals(book.getId(), actualBook.getId());
         assertEquals(book.getIsbn(), actualBook.getIsbn());
         assertEquals(book.getTitle(), actualBook.getTitle());
-        assertEquals(book.getAuthors().get(0).getId(), actualBook.getAuthors().get(0).getId());
+        assertEquals(book.getAuthors().getFirst().getId(), actualBook.getAuthors().getFirst().getId());
         assertEquals(book.getPages(), actualBook.getPages());
         assertEquals(book.getPublisher().getId(), actualBook.getPublisher().getId());
 
@@ -119,12 +111,13 @@ public class BooksServiceTest {
 
         List<EntityModel<?>> actual = service.search(request);
 
-        Book actualBook = (Book) actual.get(0).getContent();
+        Book actualBook = (Book) actual.getFirst().getContent();
 
+        assert actualBook != null;
         assertEquals(book.getId(), actualBook.getId());
         assertEquals(book.getIsbn(), actualBook.getIsbn());
         assertEquals(book.getTitle(), actualBook.getTitle());
-        assertEquals(book.getAuthors().get(0).getId(), actualBook.getAuthors().get(0).getId());
+        assertEquals(book.getAuthors().getFirst().getId(), actualBook.getAuthors().getFirst().getId());
         assertEquals(book.getPages(), actualBook.getPages());
         assertEquals(book.getPublisher().getId(), actualBook.getPublisher().getId());
 
@@ -143,10 +136,11 @@ public class BooksServiceTest {
         EntityModel<?> actual = service.add(book);
         Book actualBook = (Book) actual.getContent();
 
+        assert actualBook != null;
         assertEquals(book.getId(), actualBook.getId());
         assertEquals(book.getIsbn(), actualBook.getIsbn());
         assertEquals(book.getTitle(), actualBook.getTitle());
-        assertEquals(book.getAuthors().get(0).getId(), actualBook.getAuthors().get(0).getId());
+        assertEquals(book.getAuthors().getFirst().getId(), actualBook.getAuthors().getFirst().getId());
         assertEquals(book.getPages(), actualBook.getPages());
         assertEquals(book.getPublisher().getId(), actualBook.getPublisher().getId());
 
@@ -159,20 +153,21 @@ public class BooksServiceTest {
     public void whenUpdate_thenCorrectResponse() {
         Book book = getMockBook();
 
-        Book bookUpdate = book;
-        bookUpdate.setGenres(Collections.singletonList("Fiction"));
-
         when(repository.findById("1")).thenReturn(Optional.of(book));
         when(repository.save(book)).thenReturn(book);
         when(assembler.toModel(book)).thenReturn(EntityModel.of(book));
 
+        Book bookUpdate = getMockBook();
+        bookUpdate.setGenres(Collections.singletonList("Fiction"));
+
         EntityModel<?> actual = service.update("1", bookUpdate);
         Book actualBook = (Book) actual.getContent();
 
+        assert actualBook != null;
         assertEquals(book.getId(), actualBook.getId());
         assertEquals(book.getIsbn(), actualBook.getIsbn());
         assertEquals(book.getTitle(), actualBook.getTitle());
-        assertEquals(book.getAuthors().get(0).getId(), actualBook.getAuthors().get(0).getId());
+        assertEquals(book.getAuthors().getFirst().getId(), actualBook.getAuthors().getFirst().getId());
         assertEquals(book.getPages(), actualBook.getPages());
         assertEquals(book.getPublisher().getId(), actualBook.getPublisher().getId());
         assertTrue(actualBook.getGenres().contains("Fiction"));

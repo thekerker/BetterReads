@@ -1,21 +1,19 @@
 package com.betterreads.services.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.betterreads.assemblers.BooksAssembler;
+import com.betterreads.exceptions.ItemNotFoundException;
+import com.betterreads.models.Book;
+import com.betterreads.repositories.BooksRepository;
+import com.betterreads.services.IService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
-import com.betterreads.assemblers.BooksAssembler;
-import com.betterreads.exceptions.ItemNotFoundException;
-import com.betterreads.repositories.BooksRepository;
-import com.betterreads.models.Book;
-import com.betterreads.services.IService;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -49,7 +47,7 @@ public class BooksService implements IService {
      * Gets book by id
      * </p>
      * 
-     * @param id the books's id in the database
+     * @param id the book's id in the database
      * @return The book
      */
     @Override
@@ -73,7 +71,10 @@ public class BooksService implements IService {
         ExampleMatcher matcher = ExampleMatcher.matchingAny().withIgnoreCase();
         Example<Book> example = Example.of(book, matcher);
 
-        return repository.findAll(example).stream().map(assembler::toModel).collect(Collectors.toList());
+        return repository.findAll(example)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -88,7 +89,7 @@ public class BooksService implements IService {
     public EntityModel<?> add(Object entity) {
         Book saved = repository.save((Book) entity);
 
-        log.info("Saved book with id " + saved.getId());
+        log.info("Saved book with id {}", saved.getId());
 
         return assembler.toModel(saved);
     }
@@ -117,7 +118,7 @@ public class BooksService implements IService {
             return repository.save(book);
         }).orElseThrow(() -> new ItemNotFoundException(id));
 
-        log.info("Updated book with id " + id);
+        log.info("Updated book with id {}", id);
 
         return assembler.toModel(updated);
     }
@@ -131,7 +132,7 @@ public class BooksService implements IService {
      */
     @Override
     public void delete(String id) {
-        log.info("Deleted book with id " + id);
+        log.info("Deleted book with id {}", id);
 
         repository.deleteById(id);
     }

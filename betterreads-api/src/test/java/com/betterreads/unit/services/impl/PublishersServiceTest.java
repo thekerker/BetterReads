@@ -1,9 +1,10 @@
 package com.betterreads.unit.services.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
+import com.betterreads.assemblers.PublishersAssembler;
+import com.betterreads.exceptions.ItemNotFoundException;
+import com.betterreads.models.Publisher;
+import com.betterreads.repositories.PublishersRepository;
+import com.betterreads.services.impl.PublishersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,20 +13,15 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Example;
 import org.springframework.hateoas.EntityModel;
 
-import com.betterreads.assemblers.PublishersAssembler;
-import com.betterreads.exceptions.ItemNotFoundException;
-import com.betterreads.models.Publisher;
-import com.betterreads.repositories.PublishersRepository;
-import com.betterreads.services.impl.PublishersService;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class PublishersServiceTest {
 
@@ -53,8 +49,9 @@ public class PublishersServiceTest {
 
         List<EntityModel<?>> actual = service.getAll();
 
-        Publisher actualPublisher = (Publisher) actual.get(0).getContent();
+        Publisher actualPublisher = (Publisher) actual.getFirst().getContent();
 
+        assert actualPublisher != null;
         assertEquals(publisher.getId(), actualPublisher.getId());
         assertEquals(publisher.getName(), actualPublisher.getName());
 
@@ -73,6 +70,7 @@ public class PublishersServiceTest {
         EntityModel<?> actual = service.getById("1");
         Publisher actualPublisher = (Publisher) actual.getContent();
 
+        assert actualPublisher != null;
         assertEquals(publisher.getId(), actualPublisher.getId());
         assertEquals(publisher.getName(), actualPublisher.getName());
 
@@ -106,8 +104,9 @@ public class PublishersServiceTest {
 
         List<EntityModel<?>> actual = service.search(request);
 
-        Publisher actualPublisher = (Publisher) actual.get(0).getContent();
+        Publisher actualPublisher = (Publisher) actual.getFirst().getContent();
 
+        assert actualPublisher != null;
         assertEquals(publisher.getId(), actualPublisher.getId());
         assertEquals(publisher.getName(), actualPublisher.getName());
 
@@ -126,6 +125,7 @@ public class PublishersServiceTest {
         EntityModel<?> actual = service.add(publisher);
         Publisher actualPublisher = (Publisher) actual.getContent();
 
+        assert actualPublisher != null;
         assertEquals(publisher.getId(), actualPublisher.getId());
         assertEquals(publisher.getName(), actualPublisher.getName());
 
@@ -138,16 +138,17 @@ public class PublishersServiceTest {
     public void whenUpdate_thenCorrectResponse() {
         Publisher publisher = getMockPublisher();
 
-        Publisher publisherUpdate = publisher;
-        publisherUpdate.setName("Orbit");
-
         when(repository.findById("1")).thenReturn(Optional.of(publisher));
         when(repository.save(publisher)).thenReturn(publisher);
         when(assembler.toModel(publisher)).thenReturn(EntityModel.of(publisher));
 
+        Publisher publisherUpdate = getMockPublisher();
+        publisherUpdate.setName("Orbit");
+
         EntityModel<?> actual = service.update("1", publisherUpdate);
         Publisher actualPublisher = (Publisher) actual.getContent();
 
+        assert actualPublisher != null;
         assertEquals(publisher.getId(), actualPublisher.getId());
         assertEquals(publisher.getName(), actualPublisher.getName());
 

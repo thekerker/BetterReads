@@ -1,21 +1,20 @@
 package com.betterreads.unit.assemblers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import com.betterreads.assemblers.AuthorsAssembler;
+import com.betterreads.models.Author;
+import com.betterreads.models.Book;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-
-import com.betterreads.assemblers.AuthorsAssembler;
-import com.betterreads.models.Author;
-import com.betterreads.models.Book;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AuthorsAssemblerTest {
 
@@ -54,10 +53,10 @@ public class AuthorsAssemblerTest {
         assertEquals("Los Angeles", entity.getContent().getCity());
         assertEquals("CA", entity.getContent().getState());
         assertNotNull(entity.getContent().getDateOfBirth());
-        assertEquals("1", entity.getContent().getBooks().get(0).getId());
+        assertEquals("1", entity.getContent().getBooks().getFirst().getId());
 
         assertEquals(2, entity.getLinks().toList().size());
-        assertEquals("/v1/authors/1", entity.getLinks().getLink(IanaLinkRelations.SELF).get().getHref());
-        assertEquals("/v1/authors", entity.getLinks().getLink("v1/authors").get().getHref());
+        assertEquals("/v1/authors/1", Objects.requireNonNull(entity.getLinks().getLink(IanaLinkRelations.SELF).orElse(null)).getHref());
+        assertEquals("/v1/authors", Objects.requireNonNull(entity.getLinks().getLink("v1/authors").orElse(null)).getHref());
     }
 }

@@ -1,21 +1,19 @@
 package com.betterreads.services.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.betterreads.assemblers.AuthorsAssembler;
+import com.betterreads.exceptions.ItemNotFoundException;
+import com.betterreads.models.Author;
+import com.betterreads.repositories.AuthorsRepository;
+import com.betterreads.services.IService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
-import com.betterreads.assemblers.AuthorsAssembler;
-import com.betterreads.exceptions.ItemNotFoundException;
-import com.betterreads.models.Author;
-import com.betterreads.repositories.AuthorsRepository;
-import com.betterreads.services.IService;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -73,7 +71,10 @@ public class AuthorsService implements IService {
         ExampleMatcher matcher = ExampleMatcher.matchingAny().withIgnoreCase();
         Example<Author> example = Example.of(author, matcher);
 
-        return repository.findAll(example).stream().map(assembler::toModel).collect(Collectors.toList());
+        return repository.findAll(example)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -88,7 +89,7 @@ public class AuthorsService implements IService {
     public EntityModel<?> add(Object entity) {
         Author saved = repository.save((Author) entity);
 
-        log.info("Saved author with id " + saved.getId());
+        log.info("Saved author with id {}", saved.getId());
 
         return assembler.toModel(saved);
     }
@@ -118,7 +119,7 @@ public class AuthorsService implements IService {
             return repository.save(author);
         }).orElseThrow(() -> new ItemNotFoundException(id));
 
-        log.info("Updated author with id " + id);
+        log.info("Updated author with id {}", id);
 
         return assembler.toModel(updated);
     }
@@ -132,7 +133,7 @@ public class AuthorsService implements IService {
      */
     @Override
     public void delete(String id) {
-        log.info("Deleted author with id " + id);
+        log.info("Deleted author with id {}", id);
 
         repository.deleteById(id);
     }
